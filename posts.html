@@ -1,0 +1,22 @@
+---
+title: Posts
+layout: default
+---
+<h1>
+    Posts
+</h1>
+
+<ul class="posts-list">
+    {% for post in site.posts %}
+    <li>
+        <h2>
+            <a class="posts-link" href="{{ post.url | prepend: site.baseurl }}">
+                {{ post.title }}
+            </a>
+        </h2>
+        <span class="post-date">
+            {{ post.date | date: "%b %-d, %Y" }}
+        </span>
+    </li>
+    {% endfor %}
+</ul>

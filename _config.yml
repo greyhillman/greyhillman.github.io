@@ -1,1 +1,19 @@
 # Jekyll configuration file
+title: greyhillman.github.io
+email: infogreytech@gmail.com
+description: A website for my thoughts, projects, and resume.
+twitter_username: greyhillman
+github_username: greyhillman
+test_username: greyhillman
+linkedin_username: greyhillman
+
+markdown: kramdown
+highlighter: rouge
+
+
+exclude:
+    - script
+    - Gemfile
+    - Gemfile.lock
+    - README.md
+

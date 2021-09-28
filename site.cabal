@@ -1,0 +1,55 @@
+cabal-version:      2.4
+name:               site
+version:            0.1.0.0
+
+author:             Grey Hill
+maintainer:         infogreytech@gmail.com
+
+extra-source-files:
+    README.md
+
+executable site
+    main-is:          Main.hs
+    hs-source-dirs:   site
+
+    other-modules:
+        Home
+        , Page
+        , About
+        , Resume
+        , Posts.Index
+        , Posts.Post
+        , Posts.Hello.Index
+    default-language: Haskell2010
+    build-depends:
+        base ^>=4.12.0.0
+        , shake ^>=0.19.5
+        , pandoc ^>=2.14.1
+        , pandoc-types ^>=1.22
+        , mustache ^>=2.3.1
+        , text ^>=1.2.4.1
+        , dhall ^>=1.40.1
+        , lens ^>=5.0.1
+        , raw-strings-qq ^>=1.1
+        , ee-lang
+        , string-conversions ^>=0.4.0.1
+        , mtl ^>=2.2.2
+
+library ee-lang
+    hs-source-dirs:    src
+    exposed-modules:
+        Development.Build.Graph
+        , Development.Build.HTML
+        , Development.Build.Markdown
+        , Development.Site
+    other-modules:
+    default-language: Haskell2010
+    build-depends:
+        base ^>=4.12.0.0
+        , text ^>=1.2.4.1
+        , containers ^>=0.6.5.1
+        , mtl ^>=2.2.2
+        , shake ^>=0.19.5
+        , string-conversions ^>=0.4.0.1
+        , recursion-schemes ^>=5.2.2.1
+        , pandoc ^>=2.14.1

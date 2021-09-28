@@ -1,7 +1,20 @@
 # [Personal Website](https://greyhillman.github.io)
 
-[![Build Status](https://travis-ci.org/greyhillman/greyhillman.github.io.svg?branch=master)](https://travis-ci.org/greyhillman/greyhillman.github.io)
+## Setup
 
-This is a website to at least showcase my projects.
-It also serves as an example of HTML & CSS skills.
+```
+npm install        # NPM packages
+npm run build:dev  # cabal packages
+```
 
+## How to Build
+
+```
+npm run build:dev
+```
+
+## How to Deploy
+
+```
+npm run deploy
+```

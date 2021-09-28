@@ -1,0 +1,26 @@
+.icon(@url) {
+  &::before {
+    display: inline-block;
+    content: "";
+    background-image: @url;
+    background-size: contain;
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+  }
+}
+
+.icon {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  &.github {
+    .icon(url("../image/GitHub-Mark-32px.png"));
+  }
+
+  &.linkedin {
+    .icon(url("../image/In-Blue-34.png"));
+  }
+}

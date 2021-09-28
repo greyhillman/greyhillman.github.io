@@ -1,0 +1,59 @@
+@base_size: 3.5rem;
+@base_top_margin: 1.5rem;
+@base_bottom_margin: 1rem;
+
+@min_size: 1.6rem;
+@min_top_margin: 1rem;
+@min_bottom_margin: 0.5rem;
+
+@step_size: 0.5rem;
+@step_top: 0.25rem;
+@step_bottom: 0.125rem;
+
+header,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: normal;
+  font-weight: bold;
+  border-bottom: 0.2rem solid #000;
+
+  font-size: @base_size;
+  margin-top: @base_top_margin;
+  margin-bottom: @base_bottom_margin;
+}
+
+.header_level(@i) {
+  font-size: max(@base_size - ((@i - 1) * @step_size), @min_size);
+  margin-top: max(@base_top_margin - (@i - 1) * @step_top, @min_top_margin);
+  margin-bottom: max(
+    @base_bottom_margin - (@i - 1) * @step_bottom,
+    @min_bottom_margin
+  );
+}
+
+.generate_header_levels(@n, @i: 1) when (@i <= @n) {
+  h@{i} {
+    .header_level(@i);
+  }
+
+  .generate_header_levels(@n, (@i + 1));
+}
+.generate_header_levels(6);
+
+.nested_headers(@n, @i: 2) when (@i <= @n) {
+  & ~ section > header {
+    .header_level(@i);
+
+    .nested_headers(@n, @i + 1);
+  }
+}
+header {
+  .header_level(1);
+
+  .nested_headers(5);
+}

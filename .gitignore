@@ -1,2 +1,7 @@
-_site/*
-*.lock
+# Build output
+_site
+dist-newstyle
+
+.shake
+
+node_modules

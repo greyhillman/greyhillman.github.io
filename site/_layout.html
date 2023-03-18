@@ -2,26 +2,31 @@
 
 <head>
     <title>Grey Hill - {{ title }}</title>
-    <link rel="stylesheet" href="./css/base.css" />
+    <link rel="stylesheet" href="./css/default.css" />
+    <base href="." />
 </head>
 
 <body>
     <nav>
-        <li>
-            <a href="./index.html">Home</a>
-        </li>
-        <li>
-            <a href="./posts.html">Posts</a>
-        </li>
-        <li>
-            <a href="./about.html">About</a>
-        </li>
-        <li>
-            <a href="./resume.html">Resume</a>
-        </li>
+        <ol>
+            <li>
+                <a href="./index.html">Home</a>
+            </li>
+            <li>
+                <a href="./posts.html">Posts</a>
+            </li>
+            <li>
+                <a href="./about.html">About</a>
+            </li>
+            <li>
+                <a href="./resume.html">Resume</a>
+            </li>
+        </ol>
     </nav>
 
-    {{ body }}
+    <main>
+        {{ body }}
+    </main>
 
     <footer>
         <ul>

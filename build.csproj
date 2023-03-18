@@ -7,4 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Nuget.Shake\Shake\Shake.csproj" />
+    <ProjectReference Include="..\Nuget.Shake\Shake.FilePath\Shake.FilePath.csproj" />
+  </ItemGroup>
+
 </Project>

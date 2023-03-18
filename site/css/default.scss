@@ -1,6 +1,6 @@
-@import "./header.less";
-@import "./figure.less";
-@import "./icons.less";
+@use "header";
+@use "figure";
+@use "icons";
 
 * {
   box-sizing: border-box;
@@ -17,14 +17,14 @@ ol {
   list-style-position: inside;
 }
 
-.border-bottom-radius(@radius) {
-  border-bottom-left-radius: @radius;
-  border-bottom-right-radius: @radius;
+@mixin border-bottom-radius($radius) {
+  border-bottom-left-radius: $radius;
+  border-bottom-right-radius: $radius;
 }
 
-.h-padding(@amount) {
-  padding-left: @amount;
-  padding-right: @amount;
+@mixin h-padding($amount) {
+  padding-left: $amount;
+  padding-right: $amount;
 }
 
 body {
@@ -33,10 +33,12 @@ body {
   width: min(60rem, 100%);
   min-height: 100%;
   margin: 0 auto;
-  .h-padding(1em);
+
+  @include h-padding(1em);
 
   box-shadow: 0 0 10px 5px #c9c9c9;
-  .border-bottom-radius(1em);
+
+  @include border-bottom-radius(1em);
 }
 
 p {

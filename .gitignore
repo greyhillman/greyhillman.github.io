@@ -9,3 +9,6 @@ node_modules
 # .NET build files
 bin/
 obj/
+
+# SASS compiler files
+.sass-cache/

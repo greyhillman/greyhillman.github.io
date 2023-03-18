@@ -23,6 +23,7 @@ namespace Site
                 "dist/resume.html",
                 "dist/image/GitHub-Mark-32px.png",
                 "dist/image/In-Blue-34.png",
+                "dist/css/default.css",
             });
         }
 
@@ -47,6 +48,9 @@ namespace Site
             copy_files.AddFile("dist/image/In-Blue-34.png");
 
             rules.Add(copy_files);
+
+            var sass = new SassRule();
+            rules.Add(sass);
         }
     }
 }

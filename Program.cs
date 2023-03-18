@@ -21,6 +21,8 @@ namespace Site
                 "dist/index.html",
                 "dist/about.html",
                 "dist/resume.html",
+                "dist/image/GitHub-Mark-32px.png",
+                "dist/image/In-Blue-34.png",
             });
         }
 
@@ -39,6 +41,12 @@ namespace Site
             top_page.AddFile("dist/resume.html", "Resume");
 
             rules.Add(top_page);
+
+            var copy_files = new CopyRule();
+            copy_files.AddFile("dist/image/GitHub-Mark-32px.png");
+            copy_files.AddFile("dist/image/In-Blue-34.png");
+
+            rules.Add(copy_files);
         }
     }
 }

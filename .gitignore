@@ -5,3 +5,7 @@ dist-newstyle
 .shake
 
 node_modules
+
+# .NET build files
+bin/
+obj/

@@ -13,8 +13,8 @@ public class SassRule : IRule
 
     public async Task Build(IBuildSystem.IBuilder builder)
     {
-        var input_file = FilePath.From(builder.OutputFile);
-        input_file.Directory.Levels[0] = "site";
+        var input_file = new FilePathBuilder(builder.OutputFile);
+        input_file.Directory[0] = "site";
         input_file.Extension = "scss";
 
         await builder.Need(input_file.ToString());
@@ -35,6 +35,6 @@ public class SassRule : IRule
 
     public bool IsFor(string file)
     {
-        return FilePath.From(file).Extension == "css";
+        return new FilePath(file).Extension == "css";
     }
 }

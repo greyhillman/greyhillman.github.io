@@ -20,20 +20,21 @@ public class TopPageRule : IRule
 
     public void AddFile(string file, string title)
     {
-        _pages.Add(new TopPage(FilePath.From(file), title));
+        _pages.Add(new TopPage(new FilePath(file), title));
     }
 
     public async Task Build(IBuildSystem.IBuilder builder)
     {
-        var body_file = FilePath.From(builder.OutputFile);
+        var body_file = new FilePathBuilder(builder.OutputFile);
+        body_file.Directory[0] = "out";
         body_file.Extension = "partial.html";
 
-        await builder.Need(body_file.ToString(), _layout_file.ToString());
+        await builder.Need(body_file.Path.ToString(), _layout_file.ToString());
 
-        var body = await File.ReadAllTextAsync(body_file.ToString());
+        var body = await File.ReadAllTextAsync(body_file.Path.ToString());
         var layout = await File.ReadAllTextAsync(_layout_file.ToString());
 
-        var page = _pages.Find(page => page.Path == FilePath.From(builder.OutputFile));
+        var page = _pages.Find(page => page.Path == new FilePath(builder.OutputFile));
 
         var output = layout
             .Replace("{{ body }}", body)
@@ -47,9 +48,11 @@ public class TopPageRule : IRule
 
     public bool IsFor(string file)
     {
+        var path = new FilePath(file);
+
         foreach (var page in _pages)
         {
-            if (page.Path == FilePath.From(file))
+            if (page.Path == path)
             {
                 return true;
             }

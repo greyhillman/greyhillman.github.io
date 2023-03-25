@@ -17,13 +17,13 @@ public class CopyRule : IRule
 
     public void AddFile(string file)
     {
-        _files.Add(FilePath.From(file));
+        _files.Add(new FilePath(file));
     }
 
     public async Task Build(IBuildSystem.IBuilder builder)
     {
-        var source_file = FilePath.From(builder.OutputFile);
-        source_file.Directory.Levels[0] = "site";
+        var source_file = new FilePathBuilder(builder.OutputFile);
+        source_file.Directory[0] = "site";
 
         await builder.Need(source_file.ToString());
 
@@ -37,6 +37,6 @@ public class CopyRule : IRule
 
     public bool IsFor(string file)
     {
-        return _files.Contains(FilePath.From(file));
+        return _files.Contains(new FilePath(file));
     }
 }

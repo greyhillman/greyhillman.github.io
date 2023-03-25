@@ -12,3 +12,6 @@ obj/
 
 # SASS compiler files
 .sass-cache/
+
+# Intermediate results from the build
+out/

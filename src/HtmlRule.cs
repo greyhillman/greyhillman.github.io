@@ -4,15 +4,22 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Shake;
-using Shake.FilePath;
+using Shake.FileSystem;
 
 namespace Site;
 
-public class HtmlRule : IRule
+public class HtmlRule : IRule<FilePath>
 {
-    public async Task Build(IBuildSystem.IBuilder builder)
+    private readonly IFileSystem _file_system;
+
+    public HtmlRule(IFileSystem file_system)
     {
-        var outputPath = new FilePath(builder.OutputFile);
+        _file_system = file_system;
+    }
+
+    public async Task Build(IBuildSystem<FilePath>.IBuilder builder)
+    {
+        var outputPath = builder.Resource;
 
         var markdownFile = new FilePathBuilder(outputPath);
         markdownFile.Directory[0] = "site";
@@ -20,7 +27,7 @@ public class HtmlRule : IRule
 
         if (File.Exists(markdownFile.Path.ToString()))
         {
-            await builder.Need(markdownFile.Path.ToString());
+            await builder.Need(markdownFile.Path);
 
             var pandoc = new Process();
             pandoc.StartInfo.FileName = "pandoc";
@@ -37,29 +44,29 @@ public class HtmlRule : IRule
                 output = await pandoc.StandardOutput.ReadToEndAsync();
             }
 
-            using (var writer = builder.WriteChanged(builder.OutputFile))
+            using (var writer = await _file_system.SetText(builder.Resource))
             {
-                await writer.WriteAsync(Encoding.UTF8.GetBytes(output));
+                await writer.WriteAsync(output);
             }
         }
         else
         {
-            var htmlFile = new FilePathBuilder(builder.OutputFile);
+            var htmlFile = new FilePathBuilder(builder.Resource);
             htmlFile.Directory[0] = "site";
 
             Debug.Assert(File.Exists(htmlFile.Path.ToString()));
 
-            Console.WriteLine(builder.OutputFile);
+            Console.WriteLine(builder.Resource);
 
-            await builder.Copy(htmlFile.Path.ToString(), builder.OutputFile);
+            await _file_system.Copy(htmlFile.Path, builder.Resource);
         }
+
+        await builder.Built(builder.Resource);
     }
 
-    public bool IsFor(string file)
+    public bool IsFor(FilePath file)
     {
-        var path = new FilePath(file);
-
-        return path.Extension == "html"
-            && path.Directory[0] != "site";
+        return (file.Extension == "html" || file.Extension == "md.html")
+            && file.Directory[0] != "site";
     }
 }

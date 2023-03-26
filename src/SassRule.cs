@@ -2,39 +2,47 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Shake;
-using Shake.FilePath;
+using Shake.FileSystem;
 
 namespace Site;
 
-public class SassRule : IRule
+public class SassRule : IRule<FilePath>
 {
-    public SassRule()
-    { }
+    private readonly IFileSystem _file_system;
 
-    public async Task Build(IBuildSystem.IBuilder builder)
+    public SassRule(IFileSystem file_system)
     {
-        var input_file = new FilePathBuilder(builder.OutputFile);
+        _file_system = file_system;
+    }
+
+    public async Task Build(IBuildSystem<FilePath>.IBuilder builder)
+    {
+        var input_file = new FilePathBuilder(builder.Resource);
         input_file.Directory[0] = "site";
         input_file.Extension = "scss";
 
-        await builder.Need(input_file.ToString());
+        await builder.Need(input_file.Path);
 
         var sass = new Process();
         sass.StartInfo.FileName = "rsass";
-        sass.StartInfo.ArgumentList.Add(input_file.ToString());
+        sass.StartInfo.ArgumentList.Add(input_file.Path.ToString());
         sass.StartInfo.RedirectStandardOutput = true;
         sass.Start();
 
-        using (var writer = builder.WriteChanged(builder.OutputFile))
+        await sass.WaitForExitAsync();
+
+        using (var writer = await _file_system.SetText(builder.Resource))
         {
             var output = await sass.StandardOutput.ReadToEndAsync();
 
-            await writer.WriteAsync(Encoding.UTF8.GetBytes(output));
+            await writer.WriteAsync(output);
         }
+
+        await builder.Built(builder.Resource);
     }
 
-    public bool IsFor(string file)
+    public bool IsFor(FilePath file)
     {
-        return new FilePath(file).Extension == "css";
+        return file.Extension == "css";
     }
 }

@@ -1,22 +1,26 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Shake;
-using Shake.FilePath;
+using Shake.FileSystem;
 
 namespace Site
 {
-    public class MarkdownPandocRule : IRule
+    public class MarkdownPandocRule : IRule<FilePath>
     {
-        public async Task Build(IBuildSystem.IBuilder builder)
+        private readonly IFileSystem _file_system;
+
+        public MarkdownPandocRule(IFileSystem file_system)
         {
-            var markdownFile = new FilePathBuilder(builder.OutputFile);
+            _file_system = file_system;
+        }
+
+        public async Task Build(IBuildSystem<FilePath>.IBuilder builder)
+        {
+            var markdownFile = new FilePathBuilder(builder.Resource);
             markdownFile.Extension = "md";
             markdownFile.Directory[0] = "site";
 
-            await builder.Need(markdownFile.Path.ToString());
+            await builder.Need(markdownFile.Path);
 
             var pandoc = new Process();
             pandoc.StartInfo.FileName = "pandoc";
@@ -27,21 +31,19 @@ namespace Site
 
             pandoc.Start();
 
-            string output = string.Empty;
-            using (pandoc.StandardOutput)
+            using (var writer = await _file_system.SetText(builder.Resource))
             {
-                output = await pandoc.StandardOutput.ReadToEndAsync();
+                var output = await pandoc.StandardOutput.ReadToEndAsync();
+
+                await writer.WriteAsync(output);
             }
 
-            using (var writer = builder.WriteChanged(builder.OutputFile))
-            {
-                await writer.WriteAsync(Encoding.UTF8.GetBytes(output));
-            }
+            await builder.Built(builder.Resource);
         }
 
-        public bool IsFor(string file)
+        public bool IsFor(FilePath file)
         {
-            return new FilePath(file).Extension == "md.html";
+            return file.Extension == "md.html";
         }
     }
 }

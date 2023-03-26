@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Nuget.Shake\Shake\Shake.csproj" />
-    <ProjectReference Include="..\Nuget.Shake\Shake.FilePath\Shake.FilePath.csproj" />
+    <ProjectReference Include="..\Nuget.Shake\Shake.FileSystem\Shake.FileSystem.csproj" />
   </ItemGroup>
 
 </Project>

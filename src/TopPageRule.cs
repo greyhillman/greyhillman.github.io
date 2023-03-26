@@ -1,21 +1,23 @@
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Shake;
-using Shake.FilePath;
+using Shake.FileSystem;
 
 namespace Site;
 
-public class TopPageRule : IRule
+public class TopPageRule : IRule<FilePath>
 {
+    private readonly IFileSystem _file_system;
+
     private readonly List<TopPage> _pages;
     private readonly FilePath _layout_file;
 
-    public TopPageRule(FilePath layout_file)
+    public TopPageRule(IFileSystem file_system, FilePath layout_file)
     {
-        _pages = new();
+        _file_system = file_system;
+
         _layout_file = layout_file;
+        _pages = new();
     }
 
     public void AddFile(string file, string title)
@@ -23,36 +25,38 @@ public class TopPageRule : IRule
         _pages.Add(new TopPage(new FilePath(file), title));
     }
 
-    public async Task Build(IBuildSystem.IBuilder builder)
+    public async Task Build(IBuildSystem<FilePath>.IBuilder builder)
     {
-        var body_file = new FilePathBuilder(builder.OutputFile);
+        var body_file = new FilePathBuilder(builder.Resource);
         body_file.Directory[0] = "out";
-        body_file.Extension = "partial.html";
+        body_file.Extension = "md.html";
 
-        await builder.Need(body_file.Path.ToString(), _layout_file.ToString());
+        await builder.Need(body_file.Path, _layout_file);
 
-        var body = await File.ReadAllTextAsync(body_file.Path.ToString());
-        var layout = await File.ReadAllTextAsync(_layout_file.ToString());
-
-        var page = _pages.Find(page => page.Path == new FilePath(builder.OutputFile));
-
-        var output = layout
-            .Replace("{{ body }}", body)
-            .Replace("{{ title }}", page.Title);
-
-        using (var writer = builder.WriteChanged(builder.OutputFile))
+        using (var body = await _file_system.ReadText(body_file.Path))
+        using (var layout = await _file_system.ReadText(_layout_file))
+        using (var writer = await _file_system.SetText(builder.Resource))
         {
-            await writer.WriteAsync(Encoding.UTF8.GetBytes(output));
+            var body_text = await body.ReadToEndAsync();
+            var layout_text = await body.ReadToEndAsync();
+
+            var page = _pages.Find(page => page.Path == builder.Resource);
+
+            var output = layout_text
+                .Replace("{{ body }}", body_text)
+                .Replace("{{ title }}", page.Title);
+
+            await writer.WriteAsync(output);
         }
+
+        await builder.Built(builder.Resource);
     }
 
-    public bool IsFor(string file)
+    public bool IsFor(FilePath file)
     {
-        var path = new FilePath(file);
-
         foreach (var page in _pages)
         {
-            if (page.Path == path)
+            if (page.Path == file)
             {
                 return true;
             }

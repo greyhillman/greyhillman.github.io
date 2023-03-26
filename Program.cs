@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Markdig;
 using Shake;
 using Shake.FileSystem;
 
@@ -42,17 +43,26 @@ namespace Site
             var html = new HtmlRule(fileSystem);
             rules.Add(html);
 
+            var markdownHtml = new MarkdownHtmlRule(fileSystem, BuildMarkdownPipeline());
+            rules.Add(markdownHtml);
+
             var sass = new SassRule(fileSystem);
             rules.Add(sass);
 
-            var copy_files = new CopyRule(fileSystem);
-            copy_files.AddFile("dist/image/GitHub-Mark-32px.png");
-            copy_files.AddFile("dist/image/In-Blue-34.png");
+            var copyFiles = new CopyRule(fileSystem);
+            rules.Add(copyFiles);
 
-            rules.Add(copy_files);
-
-            var sourceRule = new SourceRule<FilePath>();
+            var sourceRule = new SourceFileRule(fileSystem);
             rules.Add(sourceRule);
+        }
+
+        private static MarkdownPipeline BuildMarkdownPipeline()
+        {
+            var builder = new MarkdownPipelineBuilder();
+
+            builder.Extensions.Add(new GraphExtension());
+
+            return builder.Build();
         }
     }
 }

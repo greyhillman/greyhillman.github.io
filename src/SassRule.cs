@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Shake;
 using Shake.FileSystem;
@@ -34,6 +36,16 @@ public class SassRule : IRule<FilePath>
         using (var writer = await _file_system.SetText(builder.Resource))
         {
             var output = await sass.StandardOutput.ReadToEndAsync();
+
+            var urls = Regex.Matches(output, @"url\(""(.*)""\)");
+
+            var files = new List<FilePath>();
+            foreach (Match url in urls)
+            {
+                files.Add(builder.Resource.Directory + new FilePath(url.Groups[1].Value));
+            }
+
+            await builder.Need(files.ToArray());
 
             await writer.WriteAsync(output);
         }

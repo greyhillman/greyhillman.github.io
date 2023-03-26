@@ -1,3 +1,3 @@
 # Posts
 
--   [Inline `graphviz` Graphs](./inline-graphs/index.html)
+-   [Inline `graphviz` Graphs](./posts/inline-graphs/index.html)

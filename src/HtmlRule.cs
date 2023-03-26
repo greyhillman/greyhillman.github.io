@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 using Shake;
 using Shake.FileSystem;
 
@@ -10,11 +13,11 @@ namespace Site;
 
 public class HtmlRule : IRule<FilePath>
 {
-    private readonly IFileSystem _file_system;
+    private readonly IFileSystem _fileSystem;
 
     public HtmlRule(IFileSystem file_system)
     {
-        _file_system = file_system;
+        _fileSystem = file_system;
     }
 
     public async Task Build(IBuildSystem<FilePath>.IBuilder builder)
@@ -25,27 +28,36 @@ public class HtmlRule : IRule<FilePath>
         markdownFile.Directory[0] = "site";
         markdownFile.Extension = "md";
 
-        if (File.Exists(markdownFile.Path.ToString()))
+        if (await _fileSystem.Exists(markdownFile.Path))
         {
-            await builder.Need(markdownFile.Path);
+            var htmlFile = new FilePathBuilder(markdownFile.Path);
+            htmlFile.Directory[0] = "out";
+            htmlFile.Extension = "md.html";
 
-            var pandoc = new Process();
-            pandoc.StartInfo.FileName = "pandoc";
-            pandoc.StartInfo.ArgumentList.Add("--from=markdown");
-            pandoc.StartInfo.ArgumentList.Add("--to=html");
-            pandoc.StartInfo.ArgumentList.Add(markdownFile.Path.ToString());
-            pandoc.StartInfo.RedirectStandardOutput = true;
+            var layoutFile = new FilePath("site/_layout.html");
 
-            pandoc.Start();
+            await builder.Need(htmlFile.Path, layoutFile);
 
-            string output = string.Empty;
-            using (pandoc.StandardOutput)
+            using (var body = await _fileSystem.ReadText(htmlFile.Path))
+            using (var layout = await _fileSystem.ReadText(layoutFile))
+            using (var writer = await _fileSystem.SetText(builder.Resource))
             {
-                output = await pandoc.StandardOutput.ReadToEndAsync();
-            }
+                var bodyText = await body.ReadToEndAsync();
+                var layoutText = await layout.ReadToEndAsync();
 
-            using (var writer = await _file_system.SetText(builder.Resource))
-            {
+                var depth = builder.Resource.Directory.Depth - 1;
+
+                var baseUrl = new DirectoryBuilder();
+                for (var i = 0; i < depth; i++)
+                {
+                    baseUrl.Down("..");
+                }
+
+                var output = layoutText
+                    .Replace("{{ body }}", bodyText)
+                    .Replace("{{ title }}", "FIX TITLE")
+                    .Replace("{{ baseUrl }}", baseUrl.Directory.ToString());
+
                 await writer.WriteAsync(output);
             }
         }
@@ -54,11 +66,24 @@ public class HtmlRule : IRule<FilePath>
             var htmlFile = new FilePathBuilder(builder.Resource);
             htmlFile.Directory[0] = "site";
 
-            Debug.Assert(File.Exists(htmlFile.Path.ToString()));
+            var doc = new HtmlDocument();
+            doc.Load(htmlFile.Path.ToString());
 
-            Console.WriteLine(builder.Resource);
+            var directory = new DirectoryBuilder(builder.Resource.Directory);
+            directory[0] = "dist";
 
-            await _file_system.Copy(htmlFile.Path, builder.Resource);
+            var neededFiles = new List<FilePath>();
+            foreach (var link in doc.DocumentNode.Descendants("link"))
+            {
+                if (link.Attributes["rel"]?.Value == "stylesheet")
+                {
+                    var stylesheet = link.Attributes["href"].Value;
+
+                    neededFiles.Add(directory.Directory + new FilePath(stylesheet));
+                }
+            }
+
+            await builder.Need(neededFiles.ToArray());
         }
 
         await builder.Built(builder.Resource);
@@ -66,7 +91,6 @@ public class HtmlRule : IRule<FilePath>
 
     public bool IsFor(FilePath file)
     {
-        return (file.Extension == "html" || file.Extension == "md.html")
-            && file.Directory[0] != "site";
+        return file.Extension == "html";
     }
 }

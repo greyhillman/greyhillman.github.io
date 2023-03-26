@@ -38,15 +38,17 @@ public class TopPageRule : IRule<FilePath>
         using (var writer = await _file_system.SetText(builder.Resource))
         {
             var body_text = await body.ReadToEndAsync();
-            var layout_text = await body.ReadToEndAsync();
+            var layout_text = await layout.ReadToEndAsync();
 
             var page = _pages.Find(page => page.Path == builder.Resource);
 
             var output = layout_text
                 .Replace("{{ body }}", body_text)
-                .Replace("{{ title }}", page.Title);
+                .Replace("{{ title }}", page.Title)
+                .Replace("{{ baseUrl }}", ".");
 
             await writer.WriteAsync(output);
+            await writer.FlushAsync();
         }
 
         await builder.Built(builder.Resource);

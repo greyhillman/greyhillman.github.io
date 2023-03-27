@@ -5,3 +5,13 @@ dist-newstyle
 .shake
 
 node_modules
+
+# .NET build files
+bin/
+obj/
+
+# SASS compiler files
+.sass-cache/
+
+# Intermediate results from the build
+out/

@@ -1,3 +1,8 @@
+---
+title: About
+layout: _layout.html
+---
+
 # About me
 
 My name is Grey. I'm a full-stack developer, avid learner, and soon-to-be writer!

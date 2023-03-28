@@ -34,32 +34,9 @@ public class HtmlRule : IRule<FilePath>
             htmlFile.Directory[0] = "out";
             htmlFile.Extension = "md.html";
 
-            var layoutFile = new FilePath("site/_layout.html");
+            await builder.Need(htmlFile.Path);
 
-            await builder.Need(htmlFile.Path, layoutFile);
-
-            using (var body = await _fileSystem.ReadText(htmlFile.Path))
-            using (var layout = await _fileSystem.ReadText(layoutFile))
-            using (var writer = await _fileSystem.SetText(builder.Resource))
-            {
-                var bodyText = await body.ReadToEndAsync();
-                var layoutText = await layout.ReadToEndAsync();
-
-                var depth = builder.Resource.Directory.Depth - 1;
-
-                var baseUrl = new DirectoryBuilder();
-                for (var i = 0; i < depth; i++)
-                {
-                    baseUrl.Down("..");
-                }
-
-                var output = layoutText
-                    .Replace("{{ body }}", bodyText)
-                    .Replace("{{ title }}", "FIX TITLE")
-                    .Replace("{{ baseUrl }}", baseUrl.Directory.ToString());
-
-                await writer.WriteAsync(output);
-            }
+            await _fileSystem.Copy(htmlFile.Path, builder.Resource);
         }
         else
         {

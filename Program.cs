@@ -33,13 +33,6 @@ namespace Site
 
         private static void AddRules(List<IRule<FilePath>> rules, IFileSystem fileSystem)
         {
-            var top_page = new TopPageRule(fileSystem, new FilePath("site/_layout.html"));
-            top_page.AddFile("dist/index.html", "Home");
-            top_page.AddFile("dist/about.html", "About");
-            top_page.AddFile("dist/resume.html", "Resume");
-
-            rules.Add(top_page);
-
             var html = new HtmlRule(fileSystem);
             rules.Add(html);
 
@@ -58,7 +51,8 @@ namespace Site
 
         private static MarkdownPipeline BuildMarkdownPipeline()
         {
-            var builder = new MarkdownPipelineBuilder();
+            var builder = new MarkdownPipelineBuilder()
+                .UseYamlFrontMatter();
 
             builder.Extensions.Add(new GraphExtension());
 

@@ -1,3 +1,8 @@
+---
+title: Resume
+layout: _layout.html
+---
+
 # Resume
 
 To be added...

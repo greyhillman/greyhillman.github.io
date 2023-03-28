@@ -1,3 +1,8 @@
+---
+title: Home
+layout: _layout.html
+---
+
 # Home
 
 This is my new blog! Hopefully, I'll actually start putting

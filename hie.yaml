@@ -1,7 +1,0 @@
-cradle:
-    cabal:
-        - path: "site"
-          component: "site:exe:site"
-
-        - path: "src"
-          component: "site:lib:ee-lang"

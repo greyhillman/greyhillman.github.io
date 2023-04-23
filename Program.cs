@@ -28,6 +28,7 @@ namespace Site
                 new FilePath("dist/about.html"),
                 new FilePath("dist/resume.html"),
                 new FilePath("dist/posts/index.html"),
+                new FilePath("dist/simulators/index.html"),
             });
         }
 
@@ -39,7 +40,10 @@ namespace Site
             var markdownHtml = new MarkdownHtmlRule(fileSystem, BuildMarkdownPipeline());
             rules.Add(markdownHtml);
 
-            var sass = new SassRule(fileSystem);
+            var npmHtml = new NPMHtmlRule(fileSystem);
+            rules.Add(npmHtml);
+
+            var sass = new CssRule(fileSystem);
             rules.Add(sass);
 
             var copyFiles = new CopyRule(fileSystem);

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Shake;
 using Shake.FileSystem;
+using FileNotFoundException = Shake.FileSystem.FileNotFoundException;
 
 namespace Site;
 
@@ -28,21 +29,37 @@ public class HtmlRule : IRule<FilePath>
         markdownFile.Directory[0] = "site";
         markdownFile.Extension = "md";
 
+        var htmlFile = new FilePathBuilder(builder.Resource);
+        htmlFile.Directory[0] = "site";
+        htmlFile.Extension = "html";
+
+        var npmPackageFile = new FilePathBuilder(builder.Resource);
+        npmPackageFile.Directory[0] = "site";
+        npmPackageFile.Name = "package";
+        npmPackageFile.Extension = "json";
+
         if (await _fileSystem.Exists(markdownFile.Path))
         {
-            var htmlFile = new FilePathBuilder(markdownFile.Path);
-            htmlFile.Directory[0] = "out";
-            htmlFile.Extension = "md.html";
+            var markdownHtmlFile = new FilePathBuilder(markdownFile.Path);
+            markdownHtmlFile.Directory[0] = "out";
+            markdownHtmlFile.Extension = "md.html";
 
-            await builder.Need(htmlFile.Path);
+            await builder.Need(markdownHtmlFile.Path);
 
-            await _fileSystem.Copy(htmlFile.Path, builder.Resource);
+            await _fileSystem.Copy(markdownHtmlFile.Path, builder.Resource);
         }
-        else
+        else if (await _fileSystem.Exists(npmPackageFile.Path))
         {
-            var htmlFile = new FilePathBuilder(builder.Resource);
-            htmlFile.Directory[0] = "site";
+            var npmHtmlFile = new FilePathBuilder(builder.Resource);
+            npmHtmlFile.Directory[0] = "out";
+            npmHtmlFile.Extension = "npm.html";
 
+            await builder.Need(npmHtmlFile.Path);
+
+            await _fileSystem.Copy(npmHtmlFile.Directory.Directory, builder.Resource.Directory);
+        }
+        else if (await _fileSystem.Exists(htmlFile.Path))
+        {
             var doc = new HtmlDocument();
             doc.Load(htmlFile.Path.ToString());
 
@@ -61,6 +78,10 @@ public class HtmlRule : IRule<FilePath>
             }
 
             await builder.Need(neededFiles.ToArray());
+        }
+        else
+        {
+            throw new FileNotFoundException(builder.Resource);
         }
 
         await builder.Built(builder.Resource);

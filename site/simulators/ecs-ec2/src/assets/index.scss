@@ -1,0 +1,241 @@
+@use "sass:color";
+
+body {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+}
+
+main {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+main {
+  display: grid;
+  grid-template-areas:
+    'asg ecs'
+    'con con'
+    'sim sim';
+
+  fieldset#asg {
+    grid-area: asg;
+  }
+
+  fieldset#ecs {
+    grid-area: ecs;
+  }
+
+  #controls {
+    grid-area: con;
+  }
+
+  output#simulation {
+    grid-area: sim;
+  }
+}
+
+output.simulation {
+  width: 100%;
+}
+
+section {
+  border: solid 2px black;
+  border-radius: 1em;
+
+  padding: 1em;
+}
+
+header,legend {
+  font-weight: bold;
+}
+
+header {
+  font-size: 1.5em;
+  margin-bottom: 1em;
+}
+
+fieldset {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 0.25em;
+  row-gap: 0.25em;
+}
+
+fieldset > fieldset {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+fieldset.capacity {
+  grid-template-columns: auto auto 1fr;
+}
+
+fieldset.alarms {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+
+  & > ul {
+    display: grid;
+    grid-template-columns: subgrid;
+
+    list-style: none;
+    grid-column: span 2;
+
+    & > li {
+      grid-column: span 2;
+
+      display: grid;
+      grid-template-columns: subgrid;
+
+      & > button {
+        align-self: center;
+      }
+
+    }
+  }
+}
+
+fieldset.alarm {
+  display: grid;
+  grid-template-columns: repeat(3, max-content);
+
+  & > fieldset {
+    grid-column: span 3;
+  }
+}
+
+fieldset.utilization {
+  display: grid;
+  grid-template-columns: max-content 1fr max-content;
+}
+
+
+svg.chart {
+  width: 100%;
+}
+
+svg.chart.line g.grid line {
+  stroke: grey;
+  stroke-width: 2px;
+}
+
+svg.chart g.grid g.markers text {
+  font-size: 0.5em;
+}
+
+svg.chart .data .points circle {
+  r: 4px;
+  stroke: black;
+}
+
+svg.chart .data polyline {
+  stroke: black;
+  stroke-width: 2px;
+  fill: none;
+}
+
+$instance_color: orange;
+
+ul.instances {
+  list-style-type: none;
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+
+  column-gap: 0.5em;
+  row-gap: 0.5em;
+
+  & > li {
+    border: solid 0.25em $instance_color;
+    border-radius: 1em;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding: 0.25em;
+  }
+}
+
+ul.containers {
+  list-style: none;
+
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  column-gap: 0.25em;
+  row-gap: 0.25em;
+
+  & > li {
+    border: solid 0.25em $instance_color;
+
+    background-clip: content-box;
+    
+    // color: blue;
+    // $stripe_width: 4px;
+    // $stripe_gap: 8px;
+
+    // $stripe_color: color.adjust($instance_color, $whiteness: 50%);
+
+    // background-image: repeating-linear-gradient(
+    //   90deg,
+    //   $stripe_color $stripe_width,
+    //   white $stripe_width,
+    //   white $stripe_width + $stripe_gap,
+    //   $stripe_color ($stripe_width + $stripe_gap),
+    //   $stripe_color (2 * $stripe_width + $stripe_gap),
+    //   white (2 * $stripe_width + $stripe_gap),
+    //   white (2 * $stripe_width + 2 * $stripe_gap),
+    // );
+
+    padding: 0.25em;
+  }
+}
+
+select.operator {
+  width: min-content;
+}
+
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  width: fit-content;
+
+  column-gap: 0.5em;
+}
+
+dl dt {
+  text-align: right;
+  font-weight: bold;
+}
+
+dl dd {
+  margin-inline-start: 0;
+}
+
+figure#infrastructure {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  align-items: flex-start;
+}
+
+figure#infrastructure figcaption {
+  width: 100%;
+}
+
+section.instance header {
+  font-size: 1em;
+}
+
+section.instance + section.instance {
+  margin-top: 0;
+}
+
+
+ul {
+  padding-inline: 0;
+}
